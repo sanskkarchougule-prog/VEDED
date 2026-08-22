@@ -5,6 +5,7 @@ import VededLogo from "@/components/VededLogo";
 import { useAuth } from "@/lib/auth";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import GoogleButton from "@/components/GoogleButton";
 
 export default function Signup() {
     const { signup } = useAuth();
@@ -52,6 +53,12 @@ export default function Signup() {
                         <button type="submit" disabled={loading} data-testid="signup-submit" className="v-btn v-btn-lime w-full h-11 disabled:opacity-60">
                             {loading ? "Creating…" : "Create studio"}
                         </button>
+                        <div className="flex items-center gap-3 py-1">
+                            <span className="h-px flex-1 bg-[var(--v-border)]" />
+                            <span className="text-[11px] uppercase tracking-[0.2em] text-neutral-500">or</span>
+                            <span className="h-px flex-1 bg-[var(--v-border)]" />
+                        </div>
+                        <GoogleButton label="Sign up with Google" />
                         <p className="text-sm text-neutral-400 text-center">
                             Already have an account? <Link to="/login" className="v-link font-semibold" data-testid="signup-login-link">Sign in</Link>
                         </p>

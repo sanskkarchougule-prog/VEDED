@@ -52,6 +52,12 @@ export function AuthProvider({ children }) {
         }
     }, [persist]);
 
+    const googleLogin = useCallback(async (sessionId) => {
+        const { data } = await api.post("/auth/google/session", { session_id: sessionId });
+        persist(data.token, data.user);
+        return data.user;
+    }, [persist]);
+
     const logout = useCallback(() => {
         localStorage.removeItem("veded_token");
         localStorage.removeItem("veded_user");
@@ -66,7 +72,7 @@ export function AuthProvider({ children }) {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, signup, logout, refresh, setUser }}>
+        <AuthContext.Provider value={{ user, loading, login, signup, googleLogin, logout, refresh, setUser }}>
             {children}
         </AuthContext.Provider>
     );
