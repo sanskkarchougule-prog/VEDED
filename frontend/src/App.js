@@ -7,6 +7,8 @@ import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import AuthCallback from "@/pages/AuthCallback";
+import Settings from "@/pages/Settings";
+import Search from "@/pages/Search";
 import AppShell from "@/components/AppShell";
 import Dashboard from "@/pages/Dashboard";
 import ImagesStudio from "@/pages/ImagesStudio";
@@ -51,6 +53,8 @@ function AppRouter() {
                 <Route path="/app/bookstream" element={<BookStream />} />
                 <Route path="/app/bookstream/:id" element={<BookStreamDetail />} />
                 <Route path="/app/pricing" element={<Pricing />} />
+                <Route path="/app/settings" element={<Settings />} />
+                <Route path="/app/search" element={<Search />} />
             </Route>
 
             <Route path="/payment/success" element={<Protected><PaymentSuccess /></Protected>} />

@@ -45,6 +45,10 @@ class PhoneVerifyReq(BaseModel):
     name: Optional[str] = None
 
 
+class ProfileUpdate(BaseModel):
+    name: Optional[str] = None
+
+
 E164 = re.compile(r"^\+[1-9]\d{6,14}$")
 
 
@@ -102,6 +106,46 @@ def build_router(db):
         if not u:
             raise HTTPException(404, "User not found")
         return {"user": _public_user(u)}
+
+    @router.patch("/profile")
+    async def update_profile(payload: ProfileUpdate, user_id: str = Depends(get_current_user_id)):
+        updates = {}
+        if payload.name is not None and payload.name.strip():
+            updates["name"] = payload.name.strip()
+        if updates:
+            await db.users.update_one({"id": user_id}, {"$set": updates})
+        u = await db.users.find_one({"id": user_id})
+        return {"user": _public_user(u)}
+
+    @router.get("/notifications")
+    async def notifications(user_id: str = Depends(get_current_user_id)):
+        u = await db.users.find_one({"id": user_id})
+        items = []
+        recent = await db.creations.find(
+            {"user_id": user_id}, {"_id": 0, "id": 1, "type": 1, "prompt": 1, "created_at": 1}
+        ).sort("created_at", -1).limit(5).to_list(5)
+        for c in recent:
+            items.append({
+                "id": c["id"], "kind": "creation", "icon": "sparkles",
+                "title": f"{(c.get('type') or 'Asset').capitalize()} ready",
+                "body": (c.get("prompt") or "")[:70], "created_at": c.get("created_at"),
+            })
+        wallet = (u or {}).get("wallet", {}) or {}
+        if wallet.get("image_credits", 0) <= 3:
+            items.insert(0, {
+                "id": "low-credits", "kind": "alert", "icon": "alert",
+                "title": "Low on credits",
+                "body": "You're running low on image credits. Top up to keep creating.",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            })
+        if not recent:
+            items.append({
+                "id": "welcome", "kind": "welcome", "icon": "star",
+                "title": "Welcome to VEDED",
+                "body": "Create your first image, video or audio to get started.",
+                "created_at": (u or {}).get("created_at"),
+            })
+        return {"notifications": items, "unread": len(items)}
 
     @router.post("/google/session")
     async def google_session(payload: GoogleSessionReq):

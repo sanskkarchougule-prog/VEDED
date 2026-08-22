@@ -1,5 +1,6 @@
 """VEDED creation studio endpoints — real gen via NVIDIA FLUX (image + animated video) & Sarvam (audio)."""
 import os
+import re
 import uuid
 import base64
 from datetime import datetime, timezone
@@ -239,5 +240,14 @@ def build_router(db):
     async def delete_creation(cid: str, user_id: str = Depends(get_current_user_id)):
         res = await db.creations.delete_one({"id": cid, "user_id": user_id})
         return {"deleted": res.deleted_count}
+
+    @router.get("/search")
+    async def search_creations(q: str = "", user_id: str = Depends(get_current_user_id)):
+        query = {"user_id": user_id}
+        if q.strip():
+            query["prompt"] = {"$regex": re.escape(q.strip()), "$options": "i"}
+        cur = db.creations.find(query, {"_id": 0}).sort("created_at", -1).limit(100)
+        items = await cur.to_list(100)
+        return {"query": q, "results": items, "count": len(items)}
 
     return router

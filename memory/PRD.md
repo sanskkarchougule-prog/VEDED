@@ -33,6 +33,11 @@ MONGO_URL, DB_NAME (protected), CORS_ORIGINS, JWT_SECRET, EMERGENT_LLM_KEY, SARV
   plans, and Stripe checkout for paid plans all working.
 
 ## Notes / Backlog (unchanged from original design)
+### TopBar controls made functional (2026-06, verified 9/9 backend + 21/21 UI)
+- New Project = dropdown launching any studio; Search = /app/search (GET /api/veded/search by prompt);
+  Notifications bell = GET /api/auth/notifications (welcome / low-credit / "ready" + unread badge);
+  Settings gear = /app/settings (edit name via PATCH /api/auth/profile, credit breakdown, logout);
+  Credits chip = dropdown with full wallet breakdown + top-up. Credits refresh after each generation.
 ### Added later (2026-06)
 - **Google sign-in** (Emergent-managed): backend `/api/auth/google/session` issues JWT; UI on Login/Signup.
 - **Resend email** (`email_service.py`): welcome email on signup + Google; payment receipt on Stripe success.
