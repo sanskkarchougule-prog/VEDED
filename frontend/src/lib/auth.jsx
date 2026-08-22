@@ -58,6 +58,11 @@ export function AuthProvider({ children }) {
         return data.user;
     }, [persist]);
 
+    const applySession = useCallback((token, u) => {
+        persist(token, u);
+        return u;
+    }, [persist]);
+
     const logout = useCallback(() => {
         localStorage.removeItem("veded_token");
         localStorage.removeItem("veded_user");
@@ -72,7 +77,7 @@ export function AuthProvider({ children }) {
     }, []);
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, signup, googleLogin, logout, refresh, setUser }}>
+        <AuthContext.Provider value={{ user, loading, login, signup, googleLogin, applySession, logout, refresh, setUser }}>
             {children}
         </AuthContext.Provider>
     );

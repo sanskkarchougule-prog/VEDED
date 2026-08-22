@@ -1,4 +1,5 @@
 """Auth routes: signup, login, me, google session."""
+import asyncio
 import httpx
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, EmailStr, Field
@@ -9,6 +10,9 @@ from auth import (
     hash_password, verify_password, create_token,
     get_current_user_id, new_id, default_wallet,
 )
+from email_service import send_welcome
+import re
+import twilio_service
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -31,11 +35,27 @@ class GoogleSessionReq(BaseModel):
     session_id: str
 
 
+class PhoneOtpReq(BaseModel):
+    phone: str
+
+
+class PhoneVerifyReq(BaseModel):
+    phone: str
+    code: str
+    name: Optional[str] = None
+
+
+E164 = re.compile(r"^\+[1-9]\d{6,14}$")
+
+
 def _public_user(u: dict) -> dict:
+    email = u.get("email")
+    fallback = (email.split("@")[0] if email else None) or u.get("phone") or "Creator"
     return {
         "id": u["id"],
-        "email": u["email"],
-        "name": u.get("name") or u["email"].split("@")[0],
+        "email": email,
+        "phone": u.get("phone"),
+        "name": u.get("name") or fallback,
         "picture": u.get("picture"),
         "veded_tier": u.get("veded_tier", "free"),
         "bookstream_tier": u.get("bookstream_tier"),
@@ -65,6 +85,7 @@ def build_router(db):
         }
         await db.users.insert_one(doc)
         token = create_token(user_id)
+        asyncio.create_task(send_welcome(doc["email"], doc["name"]))
         return {"token": token, "user": _public_user(doc)}
 
     @router.post("/login")
@@ -116,6 +137,7 @@ def build_router(db):
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }
             await db.users.insert_one(u)
+            asyncio.create_task(send_welcome(u["email"], u["name"]))
         else:
             # Link/refresh Google profile fields on the existing account.
             updates = {}
@@ -127,6 +149,56 @@ def build_router(db):
                 await db.users.update_one({"id": u["id"]}, {"$set": updates})
                 u.update(updates)
 
+        token = create_token(u["id"])
+        return {"token": token, "user": _public_user(u)}
+
+    @router.get("/phone/enabled")
+    async def phone_enabled():
+        return {"enabled": twilio_service.is_configured()}
+
+    @router.post("/phone/send-otp")
+    async def phone_send_otp(payload: PhoneOtpReq):
+        if not twilio_service.is_configured():
+            raise HTTPException(503, "Phone sign-in is not configured yet")
+        phone = payload.phone.strip().replace(" ", "")
+        if not E164.match(phone):
+            raise HTTPException(400, "Enter a valid phone number in international format, e.g. +14155552671")
+        try:
+            await twilio_service.send_otp(phone)
+        except Exception as e:
+            raise HTTPException(502, f"Could not send OTP: {e}")
+        return {"sent": True}
+
+    @router.post("/phone/verify-otp")
+    async def phone_verify_otp(payload: PhoneVerifyReq):
+        if not twilio_service.is_configured():
+            raise HTTPException(503, "Phone sign-in is not configured yet")
+        phone = payload.phone.strip().replace(" ", "")
+        if not E164.match(phone):
+            raise HTTPException(400, "Invalid phone number")
+        try:
+            ok = await twilio_service.check_otp(phone, payload.code.strip())
+        except Exception as e:
+            raise HTTPException(502, f"Could not verify OTP: {e}")
+        if not ok:
+            raise HTTPException(401, "Invalid or expired code")
+
+        u = await db.users.find_one({"phone": phone})
+        if not u:
+            user_id = new_id()
+            u = {
+                "id": user_id,
+                "email": None,
+                "phone": phone,
+                "name": payload.name or f"Creator {phone[-4:]}",
+                "auth_provider": "phone",
+                "veded_tier": "free",
+                "bookstream_tier": None,
+                "wallet": default_wallet(),
+                "trial_used": False,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }
+            await db.users.insert_one(u)
         token = create_token(u["id"])
         return {"token": token, "user": _public_user(u)}
 

@@ -28,6 +28,14 @@ MONGO_URL, DB_NAME (protected), CORS_ORIGINS, JWT_SECRET, EMERGENT_LLM_KEY, SARV
   plans, and Stripe checkout for paid plans all working.
 
 ## Notes / Backlog (unchanged from original design)
+### Added later (2026-06)
+- **Google sign-in** (Emergent-managed): backend `/api/auth/google/session` issues JWT; UI on Login/Signup.
+- **Resend email** (`email_service.py`): welcome email on signup + Google; payment receipt on Stripe success.
+  Test sender `onboarding@resend.dev` only delivers to the owner's verified email until a domain is verified.
+- **Phone sign-in** (Twilio Verify, `twilio_service.py` + `/api/auth/phone/*`): SMS OTP -> JWT. Users keyed by
+  `phone` (email null). Auto-DISABLED until TWILIO_AUTH_TOKEN + TWILIO_VERIFY_SERVICE are set in .env
+  (only TWILIO_ACCOUNT_SID provided so far). Frontend hides the Phone tab via GET /api/auth/phone/enabled,
+  so no broken UX. Add the two secrets + restart backend to go live — no code changes needed.
 - Video/Movie are placeholder outputs by design in this repo (no real T2V engine wired).
 - Header "10 FREE" chip in AppShell is static in the original design (left as-is per user's no-change request).
 - The NVIDIA/Servam/Google keys the user pasted are NOT used by this repo's code (it uses Emergent Nano Banana

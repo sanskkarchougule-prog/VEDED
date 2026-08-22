@@ -1,5 +1,6 @@
 """Stripe payments via emergentintegrations (Flow B, using STRIPE_API_KEY)."""
 import os
+import asyncio
 from datetime import datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends, Request
@@ -7,6 +8,7 @@ from pydantic import BaseModel
 
 from auth import get_current_user_id
 from plans import VEDED_PLANS, BOOKSTREAM_PLANS, TOPUP_PACKS, ALL_PACKAGES
+from email_service import send_receipt
 
 router = APIRouter(prefix="/api", tags=["payments"])
 
@@ -133,6 +135,11 @@ def build_router(db):
                             upd = _apply_purchase(u, record["package_id"])
                             if upd:
                                 await db.users.update_one({"id": record["user_id"]}, upd)
+                            pkg = ALL_PACKAGES.get(record["package_id"], {})
+                            asyncio.create_task(send_receipt(
+                                u["email"], u.get("name") or u["email"].split("@")[0],
+                                pkg.get("name", record["package_id"]), float(record.get("amount", 0)),
+                            ))
                     record = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
             except Exception as e:
                 print(f"[payments] poll error: {e}")
@@ -165,6 +172,11 @@ def build_router(db):
                         upd = _apply_purchase(u, record["package_id"])
                         if upd:
                             await db.users.update_one({"id": record["user_id"]}, upd)
+                        pkg = ALL_PACKAGES.get(record["package_id"], {})
+                        asyncio.create_task(send_receipt(
+                            u["email"], u.get("name") or u["email"].split("@")[0],
+                            pkg.get("name", record["package_id"]), float(record.get("amount", 0)),
+                        ))
             return {"ok": True}
         except Exception as e:
             print(f"[webhook] error: {e}")
