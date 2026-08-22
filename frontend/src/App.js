@@ -1,49 +1,62 @@
-import React from "react";
-import "./index.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "@/App.css";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/lib/auth";
 import { Toaster } from "sonner";
-import { AuthProvider } from "./context/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Navbar from "./components/Navbar";
-import Landing from "./pages/Landing";
-import Auth from "./pages/Auth";
-import Studio from "./pages/Studio";
-import Gallery from "./pages/Gallery";
-import Discover from "./pages/Discover";
-import Pricing from "./pages/Pricing";
-import Billing from "./pages/Billing";
-import Reels from "./pages/Reels";
-import Admin from "./pages/Admin";
 
-function Shell({ children }) {
-  return (
-    <div className="min-h-screen bg-[#0A0A0A] grain">
-      <Navbar />
-      {children}
-    </div>
-  );
+import Landing from "@/pages/Landing";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
+import AppShell from "@/components/AppShell";
+import Dashboard from "@/pages/Dashboard";
+import ImagesStudio from "@/pages/ImagesStudio";
+import VideoStudio from "@/pages/VideoStudio";
+import AudioLab from "@/pages/AudioLab";
+import MoviesStudio from "@/pages/MoviesStudio";
+import WebSeriesStudio from "@/pages/WebSeriesStudio";
+import ShortsStudio from "@/pages/ShortsStudio";
+import BookStream from "@/pages/BookStream";
+import BookStreamDetail from "@/pages/BookStreamDetail";
+import Pricing from "@/pages/Pricing";
+import PaymentSuccess from "@/pages/PaymentSuccess";
+import PaymentCancel from "@/pages/PaymentCancel";
+
+function Protected({ children }) {
+    const { user } = useAuth();
+    if (!user) return <Navigate to="/login" replace />;
+    return children;
 }
 
 function App() {
-  return (
-    <AuthProvider>
-      <Toaster theme="dark" position="top-center" richColors />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Shell><Landing /></Shell>} />
-          <Route path="/login" element={<Shell><Auth mode="login" /></Shell>} />
-          <Route path="/register" element={<Shell><Auth mode="register" /></Shell>} />
-          <Route path="/pricing" element={<Shell><Pricing /></Shell>} />
-          <Route path="/discover" element={<Shell><Discover /></Shell>} />
-          <Route path="/studio" element={<ProtectedRoute><Shell><Studio /></Shell></ProtectedRoute>} />
-          <Route path="/gallery" element={<ProtectedRoute><Shell><Gallery /></Shell></ProtectedRoute>} />
-          <Route path="/billing" element={<ProtectedRoute><Shell><Billing /></Shell></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute admin><Shell><Admin /></Shell></ProtectedRoute>} />
-          <Route path="/reels" element={<ProtectedRoute><Reels /></ProtectedRoute>} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
-  );
+    return (
+        <AuthProvider>
+            <BrowserRouter>
+                <Toaster theme="dark" position="top-right" richColors />
+                <Routes>
+                    <Route path="/" element={<Landing />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+
+                    {/* App shell routes */}
+                    <Route element={<Protected><AppShell /></Protected>}>
+                        <Route path="/app" element={<Dashboard />} />
+                        <Route path="/app/images" element={<ImagesStudio />} />
+                        <Route path="/app/audio" element={<AudioLab />} />
+                        <Route path="/app/video" element={<VideoStudio />} />
+                        <Route path="/app/movies" element={<MoviesStudio />} />
+                        <Route path="/app/web-series" element={<WebSeriesStudio />} />
+                        <Route path="/app/shorts" element={<ShortsStudio />} />
+                        <Route path="/app/bookstream" element={<BookStream />} />
+                        <Route path="/app/bookstream/:id" element={<BookStreamDetail />} />
+                        <Route path="/app/pricing" element={<Pricing />} />
+                    </Route>
+
+                    <Route path="/payment/success" element={<Protected><PaymentSuccess /></Protected>} />
+                    <Route path="/payment/cancel" element={<Protected><PaymentCancel /></Protected>} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+            </BrowserRouter>
+        </AuthProvider>
+    );
 }
 
 export default App;

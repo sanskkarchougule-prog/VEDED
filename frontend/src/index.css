@@ -1,88 +1,185 @@
-@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* VEDED Vivid Cinematic — Montserrat display + Inter body */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  --bg: #0A0A0A;
-  --surface: #141414;
-  --surface-2: #1A1A1A;
-  --primary: #FF4466;
-  --secondary: #0055FF;
-  --text: #F0F0F0;
-  --muted: #A0A0A0;
-  --border: #262626;
+    --v-bg: #0b0b0b;
+    --v-surface: #131313;
+    --v-surface-2: #1c1b1b;
+    --v-surface-3: #201f1f;
+    --v-surface-4: #2a2a2a;
+    --v-border: #2a2a2a;
+    --v-border-2: #353534;
+    --v-text: #e5e2e1;
+    --v-text-dim: #c4c9ac;
+    --v-text-mute: #8e9379;
+    --v-lime: #c3f400;
+    --v-lime-dim: #abd600;
+    --v-lime-glow: rgba(195, 244, 0, 0.28);
+    --v-danger: #ff5470;
 }
 
-* { -webkit-font-smoothing: antialiased; }
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Manrope', sans-serif;
+html, body, #root {
+    background: var(--v-bg);
+    color: var(--v-text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    min-height: 100vh;
 }
 
-h1, h2, h3, h4, .display {
-  font-family: 'Clash Display', 'Manrope', sans-serif;
+.font-display {
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.02em;
+}
+.font-display-tight {
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.04em;
 }
 
-.label {
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  letter-spacing: 0.2em;
-  color: var(--muted);
-}
+::selection { background: var(--v-lime); color: #000; }
 
-.gradient-text {
-  background: linear-gradient(92deg, #FF4466 0%, #0055FF 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.btn-gradient {
-  background: linear-gradient(92deg, #FF4466 0%, #0055FF 100%);
-  transition: filter 0.2s ease, transform 0.2s ease;
-}
-.btn-gradient:hover { filter: brightness(1.12); }
-.btn-gradient:active { transform: translateY(1px); }
-
-.glass {
-  background: rgba(20,20,20,0.7);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-.card-hover { transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease; }
-.card-hover:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255,255,255,0.18);
-  box-shadow: 0 18px 40px rgba(0,0,0,0.55);
-}
-
-.grain::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-::selection { background: #FF4466; color: #fff; }
-
+/* Custom scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #0A0A0A; }
-::-webkit-scrollbar-thumb { background: #262626; border-radius: 8px; }
-::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+::-webkit-scrollbar-track { background: var(--v-bg); }
+::-webkit-scrollbar-thumb { background: var(--v-surface-4); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--v-border-2); }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+/* Glow utilities */
+.v-glow-lime {
+    box-shadow: 0 0 24px rgba(195, 244, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+.v-glow-lime-strong {
+    box-shadow: 0 0 32px rgba(195, 244, 0, 0.35);
+}
+.v-inner-glow {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 1px 0 0 rgba(255, 255, 255, 0.04);
+}
 
-.snap-y-container { scroll-snap-type: y mandatory; }
-.snap-item { scroll-snap-align: start; }
+/* Glass card */
+.v-glass {
+    background: rgba(28, 27, 27, 0.6);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Shimmer AI processing */
+@keyframes v-shimmer {
+    0% { background-position: -400% 0; }
+    100% { background-position: 400% 0; }
+}
+.v-shimmer {
+    background: linear-gradient(
+        90deg,
+        rgba(195, 244, 0, 0.02) 0%,
+        rgba(195, 244, 0, 0.18) 50%,
+        rgba(195, 244, 0, 0.02) 100%
+    );
+    background-size: 200% 100%;
+    animation: v-shimmer 2.6s linear infinite;
+}
+
+@keyframes v-pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.85); }
+}
+.v-pulse-dot { animation: v-pulse-dot 1.6s ease-in-out infinite; }
+
+/* Buttons */
+.v-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-radius: 10px;
+    padding: 10px 18px;
+    transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+.v-btn-lime {
+    background: var(--v-lime);
+    color: #0a0f00;
+}
+.v-btn-lime:hover { box-shadow: 0 0 24px var(--v-lime-glow); transform: translateY(-1px); }
+.v-btn-ghost {
+    background: transparent;
+    color: var(--v-text);
+    border-color: var(--v-border-2);
+}
+.v-btn-ghost:hover { background: rgba(255,255,255,0.04); border-color: var(--v-lime); color: var(--v-lime); }
+
+/* Card base */
+.v-card {
+    background: linear-gradient(180deg, #1c1b1b 0%, #161515 100%);
+    border: 1px solid var(--v-border);
+    border-radius: 14px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.v-card:hover { border-color: var(--v-border-2); }
+.v-card-hoverlift:hover { transform: translateY(-2px); }
+
+/* Text link */
+.v-link { color: var(--v-lime); }
+.v-link:hover { text-decoration: underline; }
+
+/* Chip */
+.v-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--v-border);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--v-text-dim);
+}
+.v-chip-lime {
+    background: rgba(195, 244, 0, 0.08);
+    border-color: rgba(195, 244, 0, 0.4);
+    color: var(--v-lime);
+}
+
+/* Focus ring */
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, [role="button"]:focus-visible {
+    outline: 2px solid var(--v-lime);
+    outline-offset: 2px;
+}
+
+@layer base {
+    :root {
+        --background: 0 0% 4%;
+        --foreground: 0 0% 90%;
+        --card: 0 0% 8%;
+        --card-foreground: 0 0% 90%;
+        --popover: 0 0% 8%;
+        --popover-foreground: 0 0% 90%;
+        --primary: 71 100% 48%;
+        --primary-foreground: 0 0% 0%;
+        --secondary: 0 0% 14%;
+        --secondary-foreground: 0 0% 90%;
+        --muted: 0 0% 14%;
+        --muted-foreground: 60 6% 66%;
+        --accent: 71 100% 48%;
+        --accent-foreground: 0 0% 0%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 0 0% 16%;
+        --input: 0 0% 12%;
+        --ring: 71 100% 48%;
+        --radius: 0.625rem;
+    }
+    * { @apply border-border; }
+    body { @apply bg-background text-foreground; }
+}

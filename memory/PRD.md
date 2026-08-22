@@ -1,38 +1,35 @@
-# VEDED — AI Creative Studio & Streaming Platform
+# VEDED Creative Suite + BookStream
 
-## Original Problem Statement
-Import GitHub repo (was empty Emergent starter). Build a working app using user-provided AI model keys (NVIDIA NIM: FLUX.1, Stable Diffusion, Wan 2.2, LLM; Sarvam; Google). Keys must live server-side and be secure. Provide pricing with a credit system and 40% profit on every subscription. Payments via UPI number 9673856312 (show app name "VEDED", not personal name) + Razorpay. App should create images, video, audio/audiobooks, movies, web series, reels, and a bookstream for uploads — watched by people via subscription. Login: email/password + Google.
+## Context
+User's existing GitHub repo (chougulesanskkar-cmd/VEDED). This Emergent environment started BLANK
+(only the default starter). Per the user's instruction — "make it as shared repository, don't change
+any color or sequence, just make it workable" — the exact repo code was restored from GitHub into /app
+and wired to run. No design/color/sequence/copy changes were made.
 
-## Architecture
-- Backend: FastAPI + MongoDB (motor). JWT (Bearer, localStorage) auth. NVIDIA hosted APIs via httpx.
-- Frontend: React + Tailwind + framer-motion + lucide + sonner. Dark cinematic theme (Clash Display / Manrope).
-- AI: `ai_client.py` calls NVIDIA hosted GenAI (FLUX.1-dev/schnell image) + integrate.api LLM chat. Keys only in backend/.env.
+## Stack
+- Backend: FastAPI + MongoDB (motor). JWT (bcrypt) auth. Modular routers:
+  routes_auth, routes_veded (generation), routes_bookstream, routes_payments.
+- Frontend: React 19 + react-router 7 + Tailwind + framer-motion + sonner. Neon-lime cinematic dark theme.
+  Routes: / (Landing), /login, /signup, /app/* shell (Dashboard, images, audio, video, movies,
+  web-series, shorts, bookstream, pricing), /payment/success|cancel.
 
-## Integration status (verified against real APIs)
-- ✅ Image generation: FLUX.1-dev (primary), flux-schnell (fast) — REAL, working.
-- ✅ Chat/Prompt Lab: NVIDIA meta/llama LLM — REAL, working (qwen slug not in account catalog; using llama).
-- ❌ Video (Wan 2.2): NVIDIA offers it ONLY as a downloadable/self-hosted GPU NIM — NO hosted cloud API. Endpoint returns 503 "coming soon"; no credits charged.
-- ❌ Stable Diffusion XL: NVIDIA function not enabled for this account (404). Omitted.
-- ⏳ Sarvam/Riva audio (audiobooks), Movies, Web Series, Bookstream uploads: UI scaffolded, backend not yet built.
-- ⏳ Google login: not yet implemented (email/password live).
-- ⏳ Razorpay: wired but disabled (no keys); UPI manual flow is the live payment path.
+## Integrations (wired, verified working)
+- Image generation: Gemini Nano Banana via emergentintegrations + EMERGENT_LLM_KEY — REAL.
+- Audio/TTS: Sarvam (SARVAM_API_KEY_1) — REAL (falls back to placeholder audio if it fails).
+- Payments: Stripe via emergentintegrations, STRIPE_API_KEY=sk_test_emergent (test mode) — REAL checkout URLs.
+- Video & Movie generation: PLACEHOLDER mp4 outputs (mocked in the original repo — not real generation).
 
-## Credits & Pricing (40% profit margin encoded server-side)
-- Plans (INR/mo): Free ₹0/60cr, Starter ₹199/600cr, Pro ₹499/1800cr (popular), Studio ₹999/4200cr.
-- Credit packs: 300/₹99, 800/₹249, 2000/₹499.
-- Image costs: flux-dev 6cr, flux-schnell 3cr; chat 1cr.
-- /api/pricing returns cost_basis and profit per plan (margin 0.40).
+## Env (backend/.env)
+MONGO_URL, DB_NAME (protected), CORS_ORIGINS, JWT_SECRET, EMERGENT_LLM_KEY, SARVAM_API_KEY_1, STRIPE_API_KEY.
 
-## Payments
-- UPI manual: initiate → QR (upi://pay to 9673856312@upi, payee display "VEDED") + reference note → user submits UTR → admin approves at /admin → credits/plan applied.
-- Admin: admin@veded.app / VededAdmin@2026.
+## Status (restored & verified 2026-06)
+- Backend 19/19 pytest pass; frontend E2E pass (test_reports/iteration_2.json).
+- Auth, real image gen (credit decrement), audio gen, video/movie placeholders, creations list/delete,
+  plans, and Stripe checkout for paid plans all working.
 
-## Implemented (2026-06)
-- Auth (register/login/me, JWT). Studio (image gen live, prompt lab, video/audio "coming soon"). Gallery + publish. Discover feed. Pricing. Billing (UPI QR + history). Admin approvals. Reels view (feed of published/mock). Landing.
-- Tested: backend 20/20 pytest pass; frontend flows pass (iteration_1.json).
-
-## Backlog / Next
-- P1: Google login; real Razorpay (needs keys); Sarvam audiobook generation.
-- P1: Self-hosted GPU or alternative hosted provider for Wan 2.2 video.
-- P2: Bookstream uploads (object storage) + creator monetization/payout; Movies & Web Series long-form; subscription auto-expiry/renewal; per-item paywall streaming.
-- P2: internal retry/backoff tuning; move credit constants to config.
+## Notes / Backlog (unchanged from original design)
+- Video/Movie are placeholder outputs by design in this repo (no real T2V engine wired).
+- Header "10 FREE" chip in AppShell is static in the original design (left as-is per user's no-change request).
+- The NVIDIA/Servam/Google keys the user pasted are NOT used by this repo's code (it uses Emergent Nano Banana
+  + Sarvam + Stripe). Left unused to honor "don't change anything".
+- P1 ideas if user wants later: wire real video model, dynamic credit badge, Google login.

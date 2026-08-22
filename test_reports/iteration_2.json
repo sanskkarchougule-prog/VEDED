@@ -1,0 +1,31 @@
+{
+  "summary": "Backend (19/19 pytest) and frontend E2E all pass for the restored VEDED repo. Verified: signup/login/me with default wallet {image=10,video=1,audio=2000}; duplicate signup 409; bad login 401; missing token 401. Real Gemini Nano Banana image generation returns data:image/... base64 URL, generator_used='gemini-nano-banana', wallet decrements from 10→9. Insufficient credits returns 402 after zeroing image_credits. Audio via Sarvam returned generator_used='sarvam-bulbul' with a data:audio URL. Video and Movie return placeholder mp4 (BigBuckBunny etc). Creations list + delete works. GET /api/plans returns veded, bookstream, topups, feature_groups. Stripe checkout for veded_pro returned live checkout.stripe.com URL + session_id; status endpoint returns pending; free/unknown packages return 400. Frontend: landing loads (neon-lime theme intact), /signup creates account and lands in /app, /app/images generates a real image and shows it in Recent Gallery, /app/pricing lists plans and 'Buy Pro' successfully redirects to Stripe checkout.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "AppShell header", "issues": ["Header shows a static '10 FREE' credit chip that may be display-only (not driven by wallet.image_credits). Recent Gallery updates correctly after generation and API confirms decrement, so this is cosmetic — verify main agent intent."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_veded_api.py",
+    "/app/test_reports/pytest/veded_results.xml"
+  ],
+  "action_items": [
+    "(Optional) Confirm whether the header '10 FREE' badge in AppShell is intended to be a dynamic wallet.image_credits binding; if yes, wire it to user.wallet.image_credits (auth.refresh already runs post-generate)."
+  ],
+  "critical_code_review_comments": [
+    "auth.py uses default JWT_SECRET fallback 'veded-dev-secret' — env is set, but the fallback should be removed to fail-fast per env-var rules.",
+    "server.py CORS uses allow_origins=['*'] with allow_credentials=True — browsers reject credentialed requests with wildcard; not currently an issue because frontend uses Bearer header, but should tighten origin list before prod.",
+    "routes_payments.py hardcodes STRIPE_API_KEY default 'sk_test_emergent' fallback (should rely on env only)."
+  ],
+  "updated_files": ["/app/backend/tests/test_veded_api.py"],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "Users created dynamically via /api/auth/signup with TEST_ prefix; password Test@1234. Note /app/memory/test_credentials.md references /api/auth/register and admin seed which do NOT exist in the current restored repo (endpoints are /api/auth/signup/login/me only, no admin flow).",
+  "seed_data_creation": "None — tests self-provision TEST_ users.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Restored VEDED repo: auth uses /api/auth/signup (not /register). Wallet defaults image=10, video=1, audio_chars=2000. Image gen hits real Gemini Nano Banana via emergentintegrations (~5-15s). Sarvam TTS live. Stripe via emergentintegrations w/ STRIPE_API_KEY=sk_test_emergent returns real checkout.stripe.com URLs. Video/movie are intentionally placeholder mp4s. Frontend token in localStorage 'veded_token'. Ignore /app/test_reports/iteration_1.json — it's for a different build.",
+  "rca of the issue": "N/A — no functional issues found."
+}

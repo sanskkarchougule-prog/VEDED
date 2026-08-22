@@ -1,123 +1,140 @@
 {
-  "theme_archetype": "Cinematic Luxury Dark",
-  "brand_name": "VEDED",
-  "app_type": "hybrid_fullstack (AI Creative Studio + Streaming Platform)",
-  "color_system": {
-    "background": "#0A0A0A",
-    "surface": "#141414",
-    "surface_elevated": "#1A1A1A",
-    "primary_accent": "#FF4466",
-    "secondary_accent": "#0055FF",
-    "text_primary": "#F0F0F0",
-    "text_secondary": "#A0A0A0",
-    "border": "#262626",
-    "success": "#10B981",
-    "error": "#EF4444"
-  },
+  "theme": "dark",
   "typography": {
-    "headings": "Clash Display, sans-serif",
-    "body": "Manrope, sans-serif",
-    "rules": {
-      "hierarchy": "H1: text-5xl to text-6xl tracking-tight font-bold, H2: text-3xl font-semibold, Body: text-base text-gray-300 tracking-wide",
-      "labels": "uppercase text-xs tracking-[0.2em] text-gray-400"
+    "headings": {
+      "font_family": "Clash Display, sans-serif",
+      "strategy": "The Anti-Default Rule applies. Use Clash Display for an impactful, high-end editorial future look. Never use Inter for headings. Keep tight letter spacing (tracking-tight) for H1-H3.",
+      "sizes": {
+        "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tighter leading-none",
+        "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-tight",
+        "h3": "text-xl sm:text-2xl tracking-tight",
+        "h4": "text-lg sm:text-xl font-semibold"
+      }
+    },
+    "body": {
+      "font_family": "Plus Jakarta Sans, sans-serif",
+      "strategy": "Geometric Body for high readability on data-heavy dashboards and long text.",
+      "sizes": {
+        "base": "text-base leading-relaxed",
+        "small": "text-sm",
+        "labels": "text-xs uppercase tracking-[0.2em]"
+      }
+    }
+  },
+  "colors": {
+    "archetype": "LUXURY & ELECTRIC NEON HYBRID",
+    "strategy": "Deep void black base for immersion. Vivid cyan and hot pink accents for VEDED (AI Creation) and Crimson Red for BOOKSTREAM (OTT).",
+    "palette": {
+      "background": "#050505",
+      "surface": "#121212",
+      "surface_elevated": "#1A1A1A",
+      "border": "#2A2A2A",
+      "text_primary": "#F5F5F5",
+      "text_secondary": "#A1A1AA",
+      "vedad_primary": "#00E5FF",
+      "vedad_accent": "#FF007F",
+      "bookstream_primary": "#E50914",
+      "bookstream_accent": "#FFD700"
+    }
+  },
+  "visual_enhancers": {
+    "surfaces": [
+      {
+        "name": "Glassmorphism (Crystal Variant)",
+        "usage": "Sticky Headers, Navigation, Floating Toolbars",
+        "classes": "bg-black/60 backdrop-blur-xl backdrop-saturate-150 border-b border-white/10"
+      },
+      {
+        "name": "The Tracing Beam (Neon Active)",
+        "usage": "Active generation cards, Premium tier pricing cards",
+        "classes": "relative overflow-hidden border border-white/10 hover:border-cyan-500/50 shadow-[0_0_15px_rgba(0,229,255,0.15)] transition-all duration-300"
+      },
+      {
+        "name": "Grid Borders (Technical)",
+        "usage": "Dashboard settings, VEDED tool panels",
+        "classes": "border-collapse border-r border-b border-border/40"
+      }
+    ],
+    "shadows": {
+      "glow_cyan": "shadow-[0_0_20px_rgba(0,229,255,0.2)]",
+      "glow_red": "shadow-[0_0_20px_rgba(229,9,20,0.2)]",
+      "ambient": "shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
     }
   },
   "layouts": {
-    "streaming_feed": "Netflix-style horizontal scrolling containers with gap-6. Large cinematic hero banners.",
-    "studio_dashboard": "Complex BENTO grid, tight gap-4. Tool sidebar on left, main generation canvas centered, generation history right/bottom.",
-    "reels": "Full viewport height scrolling snap-y mandatory, right-aligned floating actions.",
-    "navigation": "Sticky top glassmorphism navbar (bg-black/60 backdrop-blur-xl border-b border-white/10). Hidden on reels view."
+    "spacing_system": "Generous Spacing Philosophy. Use p-6 or p-8 inside cards. Sections use py-20 or py-32.",
+    "grids": {
+      "landing_page": "Split screen or Bento Grid Mode A (Tetris Grid). grid-cols-1 md:grid-cols-12 gap-8.",
+      "veded_dashboard": "High Density Grid (Mode B). grid-cols-1 md:grid-cols-4 gap-6. Sidebars for prompts (col-span-1), Canvas for generation (col-span-3).",
+      "bookstream_browse": "Horizontal scrollable lanes (flex-row overflow-x-auto snap-x) with massive cards for featured content."
+    },
+    "alignment": "Left-align form inputs and dense content. Center-align hero content only if symmetrically balanced."
   },
-  "ui_components": {
-    "buttons": "Pill-shaped or slightly rounded (rounded-md). Primary action uses gradient background (from-pink-500 to-blue-600) with hover:brightness-110 transition. Secondary buttons use bg-white/5 border border-white/10 hover:bg-white/10.",
-    "cards": "Dark base (bg-[#141414]) with 1px border-white/5. Hover state: -translate-y-1 shadow-lg shadow-black/50 border-white/10.",
-    "inputs": "Shadcn input components customized to bg-black/40 border-white/10 text-white focus:ring-1 focus:ring-blue-500.",
-    "glass_surfaces": "Use for floating panels or tooltips: bg-[#141414]/80 backdrop-blur-md border border-white/10."
-  },
-  "image_urls": {
-    "cinematic_movies": [
-      {
-        "url": "https://images.pexels.com/photos/8271453/pexels-photo-8271453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "description": "Cinema night - use for streaming hero or movie category"
-      },
-      {
-        "url": "https://images.unsplash.com/photo-1695114584354-13e1910d491b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwzfHxjaW5lbWF0aWMlMjBtb3ZpZSUyMHNjZW5lfGVufDB8fHx8MTc4NzM3NTQyN3ww&ixlib=rb-4.1.0&q=85",
-        "description": "Night scene - use for web series thumbnail"
-      }
-    ],
-    "ai_generated_art": [
-      {
-        "url": "https://images.pexels.com/photos/31413138/pexels-photo-31413138.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "description": "Cyberpunk Neon - use for AI Image Generation gallery"
-      },
-      {
-        "url": "https://images.unsplash.com/photo-1672872476232-da16b45c9001?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHwyfHxjeWJlcnB1bmslMjBjaXR5JTIwYXJ0fGVufDB8fHx8MTc4NzM3NTQyN3ww&ixlib=rb-4.1.0&q=85",
-        "description": "Futuristic city - use for AI Image Generation showcase"
-      }
-    ],
-    "abstract_backgrounds": [
-      {
-        "url": "https://images.pexels.com/photos/29579756/pexels-photo-29579756.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "description": "Abstract fluid - use for login/register background or pricing page hero"
-      }
-    ],
-    "audiobooks": [
-      {
-        "url": "https://images.pexels.com/photos/31213674/pexels-photo-31213674.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "description": "Microphone studio - use for Audiobooks/Podcast section"
-      }
-    ],
-    "reels_vertical": [
-      {
-        "url": "https://images.pexels.com/photos/7825865/pexels-photo-7825865.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "description": "Vertical portrait - use for Reels feed thumbnail/video mockup"
-      },
-      {
-        "url": "https://images.pexels.com/photos/8484154/pexels-photo-8484154.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "description": "Vertical portrait 2 - use for Reels feed mockup"
-      }
-    ]
-  },
-  "specific_flows": {
-    "ai_generation_studio": "Include a robust left sidebar for settings (Model selection: Flux.1, Wan 2.2, Qwen, Sarvam). Display user credit balance prominently in the header. The main canvas should show real-time generation status with sleek skeleton loaders.",
-    "streaming_feed": "Horizontal carousels divided by categories (Movies, Web Series, Books, Reels). Must feel like Netflix but dedicated to AI content.",
-    "pricing_page": "Prominent display of tiers. Show '40% Profit' metrics visually for creators. Use a glassmorphism card for the premium tier to make it stand out.",
-    "payment_gateway": "Show a clear manual UPI QR code (Payment number: 9673856312, App name: VEDED). Integrate a placeholder for Razorpay button.",
-    "bookstream_upload": "Drag-and-drop file uploader zone with subtle dashed border and active state. Clear fields for metadata (Title, Category, Price/Free)."
+  "components": {
+    "navigation": "Unified glassmorphic header with an App Switcher dropdown (VEDED <-> BOOKSTREAM) and shared credit wallet balance.",
+    "cards": "Flat, sharp or max 8px border-radius. No muddy shadows. Use subtle 1px border. Dark gray background.",
+    "buttons": "Pill-shaped or slightly rounded (rounded-md). High contrast focus states. VEDED uses Cyan bg with black text. BOOKSTREAM uses Red bg with white text.",
+    "media_player": "Edge-to-edge cinematic container. Custom controls overlay using Shadcn Slider.",
+    "forms": "Use Shadcn inputs, selects. Left aligned labels, uppercase overlines."
   },
   "motion": {
-    "hover_states": "Buttons and cards should lift slightly (-translate-y-1) and increase brightness/shadows.",
-    "page_transitions": "Fade in on load using Framer Motion (opacity: 0 to 1, y: 10 to 0).",
-    "loading": "Use pulsing skeletons (animate-pulse) with dark gray backgrounds (bg-white/10) for streaming feed placeholders."
+    "hover": "Explicit hover states: hover:bg-white/10 hover:text-white. Hover cards lift slightly (-translate-y-1).",
+    "transitions": "Specific transitions only. transition-transform 0.2s ease, opacity 0.2s ease. NO transition-all.",
+    "animations": "Micro-interactions on AI generation (pulse, glowing borders). Smooth entrance for content grids."
   },
   "accessibility": {
-    "contrast": "Ensure all text meets 4.5:1 ratio. Off-white (#F0F0F0) on deep gray (#0A0A0A) provides excellent legibility.",
-    "focus": "All interactive elements must have a visible focus ring (focus:ring-2 focus:ring-blue-500 focus:outline-none).",
-    "test_ids": "Every button, input, and card MUST have a data-testid attribute for automated testing."
+    "contrast": "Ensure minimum 4.5:1 for text. Use text shadow over images.",
+    "testing": "All interactive elements MUST include data-testid attribute.",
+    "focus": "High contrast focus rings. focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-black."
   },
-  "libraries_and_tools": {
-    "icons": "lucide-react for standard UI icons, iconoir-react for more creative, distinctive line icons.",
-    "animations": "framer-motion for layout transitions and micro-interactions.",
-    "components": "shadcn/ui for complex forms, select, and dialogs. Use sonner for toast notifications (e.g., 'Video generated successfully')."
+  "image_urls": {
+    "veded_hero_abstract": {
+      "url": "https://images.unsplash.com/photo-1604818640599-71bda0165d53",
+      "description": "Futuristic abstract blue and green light streaks",
+      "category": "VEDED Landing Hero Background"
+    },
+    "veded_gallery_1": {
+      "url": "https://images.unsplash.com/photo-1712961751512-412da27901e4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzZ8MHwxfHNlYXJjaHw0fHxjeWJlcnB1bmslMjBjaXR5JTIwbmVvbnxlbnwwfHx8fDE3ODUxNTYwMjF8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Cyberpunk city street neon",
+      "category": "VEDED Creation Gallery Mockup"
+    },
+    "bookstream_cover_1": {
+      "url": "https://images.pexels.com/photos/7662618/pexels-photo-7662618.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Female astronaut holding helmet in dramatic red/blue lighting",
+      "category": "BOOKSTREAM Featured Sci-Fi Movie Cover"
+    },
+    "bookstream_cover_2": {
+      "url": "https://images.unsplash.com/photo-1722131073730-0b2bd13c9bff?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwxfHxjaW5lbWF0aWMlMjBzY2ktZmklMjBtb3ZpZSUyMHNjZW5lfGVufDB8fHx8MTc4NTI1NTUyN3ww&ixlib=rb-4.1.0&q=85",
+      "description": "Man in suit waiting for train (Cinematic)",
+      "category": "BOOKSTREAM Thriller Movie Cover"
+    },
+    "bookstream_cover_3": {
+      "url": "https://images.unsplash.com/photo-1766878777970-8c7adb08a211?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2OTV8MHwxfHNlYXJjaHw0fHxjaW5lbWF0aWMlMjBmYW50YXN5JTIwbW92aWUlMjBzY2VuZXxlbnwwfHx8fDE3ODUyNTU1Mjh8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Creepy masks cinematic scene",
+      "category": "BOOKSTREAM Horror/Fantasy Cover"
+    }
+  },
+  "libraries": {
+    "icons": "lucide-react",
+    "motion": "framer-motion for smooth transitions and tracing beam effects",
+    "scrolling": "lenis for smooth scrolling on landing pages"
   },
   "instructions_to_main_agent": [
-    "Design for pure Dark Mode. VEDED is a premium cinematic app.",
-    "Do NOT use pure white (#FFFFFF) for text; use #F0F0F0.",
-    "Do NOT use pure black (#000000); use #0A0A0A for the deepest background.",
-    "Use Shadcn UI components for complex interactions, but heavily customize their background and border colors to fit the dark cinematic theme.",
-    "Do NOT center align the app container. Respect natural reading flow.",
-    "Never use AI emoji placeholders. Use proper lucide-react icons.",
-    "Ensure the Reels section is mobile-first, taking up full height with snapping.",
-    "For the Studio Dashboard, ensure tight spacing (gap-4) and visible skeleton loaders for the image/video generation queue."
+    "DO NOT use generic centered layouts or simplistic gradients.",
+    "Implement a unified auth system and dashboard, but visually distinguish VEDED (Cyan/Pink tech vibe) and BOOKSTREAM (Red/Gold cinematic vibe).",
+    "The shared header MUST have a Glassmorphism effect and cannot be purely transparent. Include a clear toggle or dropdown to switch between VEDED and BOOKSTREAM.",
+    "Use pure HTML + Tailwind for the marketing landing page layouts to allow overlapping and asymmetry. Use Shadcn components for forms, inputs, tabs, and dashboards.",
+    "Ensure the VEDED creation tools use a dense grid layout (Grid Mode B) with the prompt inputs on the left and the generation canvas/gallery on the right.",
+    "Ensure BOOKSTREAM uses large horizontal carousels for browsing movies/audiobooks with dark cinematic overlays.",
+    "Always use the provided image URLs. NEVER use placeholder text or dummy image services."
   ],
-  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
-    "Create depth through layered design elements with z-index hierarchy.",
-    "Use glass-morphism effects with backdrop filters (12-24px blur).",
-    "You MUST NOT apply universal transition (transition: all).",
-    "You MUST NOT center align the app container in CSS.",
-    "Use modern button styles (pill-shaped or crisp rounded) with interaction animations.",
-    "Every interaction needs micro-animations - hover states, transitions.",
-    "Use sonner for toasts.",
-    "NEVER use generic placeholder URLs for images."
+  "universal_guidelines": [
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Every interaction needs micro-animations - hover states, transitions. Static = dead.",
+    "NEVER apply 'transition: all'. Use specific properties.",
+    "NEVER center align the app container (.App { text-align: center; }).",
+    "DO NOT use AI assistant Emojis for icons.",
+    "All interactive elements must include a data-testid attribute.",
+    "Use sonner for toast notifications."
   ]
 }
