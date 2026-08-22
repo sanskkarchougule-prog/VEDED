@@ -1,14 +1,16 @@
-"""VEDED creation studio endpoints — real image gen via Gemini Nano Banana, others mocked."""
+"""VEDED creation studio endpoints — real gen via NVIDIA FLUX (image + animated video) & Sarvam (audio)."""
 import os
 import uuid
 import base64
 from datetime import datetime, timezone
 from typing import Optional
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from auth import get_current_user_id, new_id
 from plans import GENERATION_COST
+import nvidia_media
 
 router = APIRouter(prefix="/api/veded", tags=["veded"])
 
@@ -121,8 +123,18 @@ def _pick_placeholder(items: list, prompt: str) -> str:
 
 
 def build_router(db):
+    @router.get("/media/{filename}")
+    async def serve_media(filename: str):
+        # Serve locally-rendered mp4s. Guard against path traversal.
+        if "/" in filename or ".." in filename or not filename.endswith(".mp4"):
+            raise HTTPException(404, "Not found")
+        path = nvidia_media.MEDIA_DIR / filename
+        if not path.exists():
+            raise HTTPException(404, "Not found")
+        return FileResponse(str(path), media_type="video/mp4")
+
     @router.post("/generate")
-    async def generate(payload: GenerateReq, user_id: str = Depends(get_current_user_id)):
+    async def generate(payload: GenerateReq, request: Request, user_id: str = Depends(get_current_user_id)):
         u = await db.users.find_one({"id": user_id})
         if not u:
             raise HTTPException(404, "User not found")
@@ -158,11 +170,19 @@ def build_router(db):
         generator_used = "placeholder"
 
         if payload.kind == "image":
-            output_url = await _generate_image_via_nano_banana(payload.prompt, payload.style)
-            if output_url:
-                generator_used = "gemini-nano-banana"
+            # Real image via NVIDIA FLUX (user's key); fallback to Nano Banana, then placeholder.
+            b64 = await nvidia_media.generate_flux_image_b64(
+                payload.prompt, payload.style, payload.aspect_ratio or "1:1", model="flux-dev"
+            )
+            if b64:
+                output_url = f"data:image/jpeg;base64,{b64}"
+                generator_used = "nvidia-flux.1-dev"
             else:
-                output_url = _pick_placeholder(PLACEHOLDER_IMAGES, payload.prompt)
+                output_url = await _generate_image_via_nano_banana(payload.prompt, payload.style)
+                if output_url:
+                    generator_used = "gemini-nano-banana"
+                else:
+                    output_url = _pick_placeholder(PLACEHOLDER_IMAGES, payload.prompt)
         elif payload.kind == "audio":
             # Language + speaker from options / voice payload
             opts = payload.options or {}
@@ -173,10 +193,20 @@ def build_router(db):
                 generator_used = "sarvam-bulbul"
             else:
                 output_url = _pick_placeholder(PLACEHOLDER_AUDIO, payload.prompt)
-        elif payload.kind == "video":
-            output_url = _pick_placeholder(PLACEHOLDER_VIDEOS, payload.prompt)
-        elif payload.kind == "movie":
-            output_url = _pick_placeholder(PLACEHOLDER_VIDEOS, payload.prompt)
+        elif payload.kind in ("video", "movie"):
+            # Real, prompt-relevant clip: FLUX keyframe animated into an MP4 (Ken-Burns).
+            seconds = 8 if payload.kind == "movie" else 5
+            filename = await nvidia_media.generate_video_from_prompt(
+                payload.prompt, payload.style, payload.aspect_ratio or "16:9", seconds
+            )
+            if filename:
+                # Return a relative URL so it resolves against the browser origin
+                # (public preview URL), avoiding the internal cluster host that
+                # request.headers['host'] leaks and which returns 403 externally.
+                output_url = f"/api/veded/media/{filename}"
+                generator_used = "nvidia-flux+ffmpeg"
+            else:
+                output_url = _pick_placeholder(PLACEHOLDER_VIDEOS, payload.prompt)
 
         await db.creations.update_one(
             {"id": cid},

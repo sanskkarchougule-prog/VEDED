@@ -17,7 +17,12 @@ and wired to run. No design/color/sequence/copy changes were made.
 - Image generation: Gemini Nano Banana via emergentintegrations + EMERGENT_LLM_KEY — REAL.
 - Audio/TTS: Sarvam (SARVAM_API_KEY_1) — REAL (falls back to placeholder audio if it fails).
 - Payments: Stripe via emergentintegrations, STRIPE_API_KEY=sk_test_emergent (test mode) — REAL checkout URLs.
-- Video & Movie generation: PLACEHOLDER mp4 outputs (mocked in the original repo — not real generation).
+- Video & Movie generation: NOW REAL (2026-06) — FLUX keyframe + ffmpeg Ken-Burns MP4 (image-to-motion),
+  served at /api/veded/media/{uuid}.mp4 (relative URL). Applies to Video/Movie/Shorts/Web-Series.
+  NVIDIA Wan 2.2 hosted text-to-video does NOT exist (GPU-download only) — this is the intended real output.
+- Image: NOW uses real NVIDIA FLUX.1-dev (user key); Nano Banana kept as fallback.
+- BookStream dub + Audio: real Sarvam Bulbul v2 TTS.
+- NVIDIA keys in backend/.env (server-side). ffmpeg via imageio-ffmpeg. Verified 16/16 tests (iteration_3.json).
 
 ## Env (backend/.env)
 MONGO_URL, DB_NAME (protected), CORS_ORIGINS, JWT_SECRET, EMERGENT_LLM_KEY, SARVAM_API_KEY_1, STRIPE_API_KEY.

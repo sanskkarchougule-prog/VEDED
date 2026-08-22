@@ -25,6 +25,44 @@ PLACEHOLDER_DUB_AUDIO: List[str] = [
     "https://cdn.pixabay.com/audio/2023/06/13/audio_5fb0c1d3d3.mp3",
 ]
 
+_SARVAM_LANG = {
+    "hi": "hi-IN", "ta": "ta-IN", "te": "te-IN", "bn": "bn-IN", "mr": "mr-IN",
+    "gu": "gu-IN", "kn": "kn-IN", "ml": "ml-IN", "pa": "pa-IN", "en-in": "en-IN",
+}
+
+
+async def _sarvam_dub(text: str, lang_code: str) -> Optional[str]:
+    """Real Sarvam TTS narration in the target language. Returns data URL or None."""
+    import os, httpx
+    key = os.environ.get("SARVAM_API_KEY_1") or os.environ.get("SARVAM_API_KEY_2")
+    if not key:
+        return None
+    target = _SARVAM_LANG.get(lang_code, "hi-IN")
+    try:
+        async with httpx.AsyncClient(timeout=45) as client:
+            resp = await client.post(
+                "https://api.sarvam.ai/text-to-speech",
+                headers={"api-subscription-key": key, "Content-Type": "application/json"},
+                json={
+                    "inputs": [text[:480]],
+                    "target_language_code": target,
+                    "speaker": "anushka",
+                    "pitch": 0, "pace": 1.0, "loudness": 1.0,
+                    "speech_sample_rate": 22050,
+                    "enable_preprocessing": True,
+                    "model": "bulbul:v2",
+                },
+            )
+            if resp.status_code == 200:
+                audios = resp.json().get("audios") or []
+                if audios:
+                    return f"data:audio/wav;base64,{audios[0]}"
+            else:
+                print(f"[bookstream] Sarvam dub {resp.status_code}: {resp.text[:200]}")
+    except Exception as e:
+        print(f"[bookstream] Sarvam dub failed: {e}")
+    return None
+
 
 def build_router(db) -> APIRouter:
     @router.get("/content")
@@ -65,13 +103,20 @@ def build_router(db) -> APIRouter:
             raise HTTPException(402, f"Insufficient dubbing credits. Need {need}.")
 
         track_id = new_id()
+        narration = f"{content['title']}. {content.get('description', '')}"
+        dubbed_url = await _sarvam_dub(narration, payload.language)
+        generator = "sarvam-bulbul"
+        if not dubbed_url:
+            dubbed_url = PLACEHOLDER_DUB_AUDIO[abs(hash(payload.content_id + payload.language)) % len(PLACEHOLDER_DUB_AUDIO)]
+            generator = "placeholder"
         track = {
             "id": track_id,
             "content_id": payload.content_id,
             "user_id": user_id,
             "language": payload.language,
             "language_name": lang["name"],
-            "dubbed_audio_url": PLACEHOLDER_DUB_AUDIO[abs(hash(payload.content_id + payload.language)) % len(PLACEHOLDER_DUB_AUDIO)],
+            "dubbed_audio_url": dubbed_url,
+            "generator_used": generator,
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
         await db.dubbed_tracks.insert_one(track)

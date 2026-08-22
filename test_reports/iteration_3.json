@@ -1,0 +1,41 @@
+{
+  "summary": "Real AI generation validated end-to-end. 16/16 pytest backend tests pass. Image via NVIDIA FLUX.1-dev returns data:image/jpeg;base64 (aspect 1:1, 16:9, 9:16 all succeed) with generator_used='nvidia-flux.1-dev' and wallet.image_credits decremented by 1. Video (kind=video) and Movie (kind=movie) via FLUX keyframe + ffmpeg Ken-Burns return real .mp4 at /api/veded/media/{uuid}.mp4 with generator_used='nvidia-flux+ffmpeg'; video decrements video_credits by 1, movie by 5. GET on served mp4 returns 200 video/mp4 with ~257KB payload. Audio via Sarvam Bulbul returns data:audio/wav (generator_used='sarvam-bulbul'). BookStream /content lists catalog including 'the-neon-archive'; POST /bookstream/dub with lang='hi' returns generator_used='sarvam-bulbul' with data:audio dubbed URL and decrements dubbing_credits by 5. Creations list contains the new .mp4 video items. Frontend E2E: signup → /app; /app/images generate → data:image visible in gallery; /app/video generate → <video> src contains /api/veded/media/*.mp4 (NOT BigBuckBunny); /app/web-series shows tier-gate upgrade screen for free tier (expected). Header credit chip is dynamic (updated from 10 → 9 after image gen).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_veded_api.py",
+    "/app/test_reports/pytest/veded_results.xml"
+  ],
+  "action_items": [
+    "None. All spec assertions pass."
+  ],
+  "critical_code_review_comments": [
+    "FIXED during testing: routes_veded.py generate() was constructing the video output_url from request.headers['host'], which leaked the internal Kubernetes cluster hostname (live-edit-space-2.cluster-12.preview.emergentcf.cloud). That domain returns 403 when accessed externally (Cloudflare), so both the pytest fetch and any frontend <video> playback would break. Changed to return a relative URL '/api/veded/media/{filename}' so the browser resolves it against the public origin (REACT_APP_BACKEND_URL). Verified: frontend renders <video src='.../api/veded/media/{uuid}.mp4'> and pytest fetches 200 video/mp4.",
+    "nvidia_media.py uses subprocess.run(ffmpeg,...) inside asyncio.to_thread which is fine; consider adding an explicit timeout kwarg on the subprocess (currently 120s) is present — OK.",
+    "PLACEHOLDER_VIDEOS list (BigBuckBunny etc.) is only used as a last-resort fallback when FLUX fails; consider logging a warning when that path is taken so failures aren't silently masked as 'real' output.",
+    "generated_media/ directory is unbounded — accumulates every video generated with no cleanup. Add a periodic janitor (e.g. delete files older than N hours) or return signed short-TTL URLs to avoid disk exhaustion.",
+    "routes_veded.py still keeps an unused import `base64` and Nano Banana fallback path referencing emergentintegrations — safe but dead-ish now that FLUX is primary; leave as-is for defense-in-depth.",
+    "routes_bookstream.py _sarvam_dub narration is only the title+description of the content (very short) — acceptable for a demo dub but could be labeled more clearly in UI as an intro dub, not full content dub.",
+    "Removed stale test files /app/backend/tests/backend_test.py and /app/backend/tests/veded_backend_test.py which asserted the old generator_used='gemini-nano-banana' string."
+  ],
+  "updated_files": [
+    "/app/backend/routes_veded.py (relative-URL fix for video/movie output_url)",
+    "/app/backend/tests/test_veded_api.py (rewrite for FLUX + ffmpeg + BookStream real-dub assertions)",
+    "/app/backend/tests/backend_test.py (DELETED — stale)",
+    "/app/backend/tests/veded_backend_test.py (DELETED — stale)"
+  ],
+  "success_rate": {"backend": "100% (16/16)", "frontend": "100%"},
+  "test_credentials": "Ephemeral users created via /api/auth/signup with TEST_ prefix (password Test@1234). Credits granted directly via Mongo (MONGO_URL / DB_NAME from backend/.env).",
+  "seed_data_creation": "None persistent — each test provisions its own TEST_ user and grants credits inline via pymongo.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Image=NVIDIA FLUX.1-dev returning base64 JPEG data URL (~10-20s). Video/Movie/Shorts/Web-Series use FLUX keyframe + ffmpeg Ken-Burns MP4 stored at /app/backend/generated_media/{uuid}.mp4 served via GET /api/veded/media/{filename} (~30-45s). IMPORTANT: backend now returns relative URL '/api/veded/media/{filename}' for video/movie output_url — DO NOT expect an absolute https URL. Prepend REACT_APP_BACKEND_URL when fetching in tests. Sarvam Bulbul v2 TTS live for both /veded/generate kind=audio and /bookstream/dub. Wan 2.2 hosted video API doesn't exist — image-to-motion MP4 IS the intended real output (not a mock). WebSeries route intentionally shows a tier-gate upgrade screen for free users. Header FREE credit chip is now bound to wallet.image_credits (was flagged as static in iteration_2; verified dynamic in iteration_3).",
+  "rca of the issue": "Video URL 403 root cause: FastAPI's request.headers['host'] reflects the internal Kubernetes ingress hostname (live-edit-space-2.cluster-12.preview.emergentcf.cloud). That internal host is not publicly reachable — Cloudflare returns 403. Mitigation applied: return a relative URL from /api/veded/generate so the browser (and tests) resolve against the public REACT_APP_BACKEND_URL origin. Verified via pytest (200 video/mp4, 257KB) and frontend <video> playback."
+}
